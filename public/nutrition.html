@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nutrition – CoreTrack</title>
+  <meta name="description" content="Track your daily meals and macros in CoreTrack. Monitor calories, protein, carbs and fats." />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">💪</div>
+        <span>CoreTrack</span>
+      </div>
+      <div class="sidebar-user">
+        <div class="user-avatar" id="sidebarAvatar">U</div>
+        <div class="user-name" id="sidebarUserName">Loading...</div>
+        <div class="user-streak" id="sidebarStreak">🔥 0 day streak</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+        <a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="workouts.html" class="nav-link"><span class="nav-icon">🏋️</span> Workouts</a>
+        <a href="nutrition.html" class="nav-link active"><span class="nav-icon">🥗</span> Nutrition</a>
+        <a href="goals.html" class="nav-link"><span class="nav-icon">🎯</span> Goals</a>
+        <div class="nav-section-label" style="margin-top:8px">Account</div>
+        <a href="profile.html" class="nav-link"><span class="nav-icon">👤</span> Profile</a>
+        <a href="#" class="nav-link" data-logout><span class="nav-icon">🚪</span> Logout</a>
+      </nav>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="main-content">
+      <header class="top-header">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+          <h1 class="page-title">Nutrition Tracker</h1>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="openModal('nutritionModal')">+ Log Meals</button>
+        </div>
+      </header>
+
+      <main class="page-content">
+        <!-- Today's Macro Summary -->
+        <div class="section-header">
+          <h2>Today's Summary</h2>
+          <span id="todayDate" style="font-size:0.85rem;color:var(--text-secondary)"></span>
+        </div>
+
+        <div class="macro-grid">
+          <div class="macro-card calories">
+            <div class="macro-value" id="todayCalories">—</div>
+            <div class="macro-label">Calories (kcal)</div>
+          </div>
+          <div class="macro-card protein">
+            <div class="macro-value" id="todayProtein">—</div>
+            <div class="macro-label">Protein (g)</div>
+          </div>
+          <div class="macro-card carbs">
+            <div class="macro-value" id="todayCarbs">—</div>
+            <div class="macro-label">Carbs (g)</div>
+          </div>
+          <div class="macro-card fats">
+            <div class="macro-value" id="todayFats">—</div>
+            <div class="macro-label">Fats (g)</div>
+          </div>
+        </div>
+
+        <!-- Calorie Goal Progress -->
+        <div class="calorie-compare" id="calorieGoalSection" style="margin-bottom:24px">
+          <div class="label-row">
+            <span class="goal-label">Daily Calorie Goal Progress</span>
+            <span id="calorieGoalText">0 / 2000 kcal</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" id="calorieGoalBar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- Nutrition Chart -->
+        <div class="chart-card" style="margin-bottom:24px">
+          <h3><span class="chart-icon">📊</span> Weekly Nutrition Trend</h3>
+          <div class="chart-wrapper">
+            <canvas id="nutritionTrendChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Nutrition Logs Table -->
+        <div class="table-wrapper">
+          <div class="table-header">
+            <h3 id="nutritionTableTitle">Nutrition Logs</h3>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Meals</th>
+                  <th>Total Calories</th>
+                  <th>Protein (g)</th>
+                  <th>Carbs (g)</th>
+                  <th>Fats (g)</th>
+                  <th>Goal Progress</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="nutritionTableBody">
+                <tr><td colspan="8"><div class="loading"><div class="spinner"></div> Loading...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Nutrition Modal -->
+  <div class="modal-overlay" id="nutritionModal">
+    <div class="modal" style="max-width:580px">
+      <div class="modal-header">
+        <h2 id="nutritionModalTitle">Log Meals</h2>
+        <button class="modal-close" onclick="closeModal('nutritionModal')">✕</button>
+      </div>
+
+      <form id="nutritionForm">
+        <input type="hidden" id="editNutritionId" />
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nutritionDate">Date</label>
+            <input type="date" id="nutritionDate" required />
+          </div>
+          <div class="form-group">
+            <label for="dailyCalorieGoal">Daily Calorie Goal</label>
+            <input type="number" id="dailyCalorieGoal" placeholder="2000" min="500" max="10000" value="2000" />
+          </div>
+        </div>
+
+        <!-- Meals Builder -->
+        <div class="section-header" style="margin-bottom:12px">
+          <span style="font-weight:600;font-size:0.9rem">Meals</span>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addMealRow()">+ Add Meal</button>
+        </div>
+
+        <div id="mealsContainer">
+          <!-- Meal rows added here -->
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:16px">
+          <button type="submit" class="btn btn-primary btn-full" id="nutritionSubmitBtn">Save Log</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal('nutritionModal')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Meals Modal -->
+  <div class="modal-overlay" id="viewMealsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Meals Detail</h2>
+        <button class="modal-close" onclick="closeModal('viewMealsModal')">✕</button>
+      </div>
+      <div id="viewMealsContent"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/nutrition.js"></script>
+</body>
+</html>

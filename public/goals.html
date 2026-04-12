@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Goals – CoreTrack</title>
+  <meta name="description" content="Set fitness goals and track your progress in CoreTrack. Monitor deadlines and completion percentages." />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">💪</div>
+        <span>CoreTrack</span>
+      </div>
+      <div class="sidebar-user">
+        <div class="user-avatar" id="sidebarAvatar">U</div>
+        <div class="user-name" id="sidebarUserName">Loading...</div>
+        <div class="user-streak" id="sidebarStreak">🔥 0 day streak</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+        <a href="dashboard.html" class="nav-link"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="workouts.html" class="nav-link"><span class="nav-icon">🏋️</span> Workouts</a>
+        <a href="nutrition.html" class="nav-link"><span class="nav-icon">🥗</span> Nutrition</a>
+        <a href="goals.html" class="nav-link active"><span class="nav-icon">🎯</span> Goals</a>
+        <div class="nav-section-label" style="margin-top:8px">Account</div>
+        <a href="profile.html" class="nav-link"><span class="nav-icon">👤</span> Profile</a>
+        <a href="#" class="nav-link" data-logout><span class="nav-icon">🚪</span> Logout</a>
+      </nav>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="main-content">
+      <header class="top-header">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+          <h1 class="page-title">Goals</h1>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="openModal('goalModal')">+ New Goal</button>
+        </div>
+      </header>
+
+      <main class="page-content">
+
+        <!-- Goal Stats -->
+        <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:28px">
+          <div class="stat-card">
+            <div class="stat-icon blue">🎯</div>
+            <div class="stat-info"><h3 id="gTotalGoals">—</h3><p>Total Goals</p></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">✅</div>
+            <div class="stat-info"><h3 id="gCompleted">—</h3><p>Completed</p></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange">⏳</div>
+            <div class="stat-info"><h3 id="gActive">—</h3><p>Active</p></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">❌</div>
+            <div class="stat-info"><h3 id="gFailed">—</h3><p>Failed</p></div>
+          </div>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="filter-bar" style="margin-bottom:20px">
+          <select id="goalStatusFilter" onchange="loadGoals()">
+            <option value="">All Goals</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+            <option value="failed">Failed</option>
+          </select>
+        </div>
+
+        <!-- Goals Cards Grid -->
+        <div class="goals-grid" id="goalsGrid">
+          <div class="loading"><div class="spinner"></div> Loading goals...</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Goals Table View -->
+        <div class="table-wrapper">
+          <div class="table-header">
+            <h3>Goals Summary</h3>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Type</th>
+                  <th>Progress</th>
+                  <th>Current / Target</th>
+                  <th>Deadline</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="goalsTableBody">
+                <tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add / Edit Goal Modal -->
+  <div class="modal-overlay" id="goalModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="goalModalTitle">New Goal</h2>
+        <button class="modal-close" onclick="closeModal('goalModal')">✕</button>
+      </div>
+
+      <form id="goalForm">
+        <input type="hidden" id="editGoalId" />
+
+        <div class="form-group">
+          <label for="goalTitle">Goal Title *</label>
+          <input type="text" id="goalTitle" placeholder="e.g. Run 100km this month" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="goalType">Goal Type *</label>
+            <select id="goalType" required>
+              <option value="weight_loss">⬇ Weight Loss</option>
+              <option value="weight_gain">⬆ Weight Gain</option>
+              <option value="run_distance">🏃 Run Distance</option>
+              <option value="strength">💪 Strength</option>
+              <option value="workout_streak">🔥 Workout Streak</option>
+              <option value="calorie_burn">🔥 Calorie Burn</option>
+              <option value="custom">✨ Custom</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="goalUnit">Unit</label>
+            <input type="text" id="goalUnit" placeholder="kg / km / workouts / kcal..." />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="goalTarget">Target Value *</label>
+            <input type="number" id="goalTarget" placeholder="100" min="0" step="0.1" required />
+          </div>
+          <div class="form-group">
+            <label for="goalCurrent">Current Value</label>
+            <input type="number" id="goalCurrent" placeholder="0" min="0" step="0.1" value="0" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="goalDeadline">Deadline *</label>
+          <input type="date" id="goalDeadline" required />
+        </div>
+
+        <div class="form-group">
+          <label for="goalDescription">Description (optional)</label>
+          <textarea id="goalDescription" placeholder="Describe your goal..."></textarea>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button type="submit" class="btn btn-primary btn-full" id="goalSubmitBtn">Create Goal</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal('goalModal')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Update Progress Modal -->
+  <div class="modal-overlay" id="updateProgressModal">
+    <div class="modal" style="max-width:400px">
+      <div class="modal-header">
+        <h2>Update Progress</h2>
+        <button class="modal-close" onclick="closeModal('updateProgressModal')">✕</button>
+      </div>
+      <form id="updateProgressForm">
+        <input type="hidden" id="updateGoalId" />
+        <div class="form-group">
+          <label id="updateProgressLabel">Current Value</label>
+          <input type="number" id="updateCurrentValue" step="0.1" min="0" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Update Progress</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/goals.js"></script>
+</body>
+</html>
