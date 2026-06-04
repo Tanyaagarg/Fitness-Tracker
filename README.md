@@ -164,12 +164,6 @@ Open [http://localhost:5000](http://localhost:5000) in your browser.
 
 ---
 
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
 <div align="center">
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:F97316,50:EF4444,100:DC2626&height=120&section=footer" width="100%"/>
